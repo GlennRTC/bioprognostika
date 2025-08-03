@@ -1,15 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Disclaimer } from '@/components/ui';
+import { Button, Disclaimer, AlgorithmToggle } from '@/components/ui';
 import { useFormState } from '../hooks/useFormState';
-import { pceCalculator } from '../services/pceAlgorithm';
+import { configuredRiskCalculator, switchToAlgorithm, enableAlgorithmComparison } from '../services';
 import StepIndicator from './StepIndicator';
 import Step1Demographics from './Step1Demographics';
 import Step2HealthMeasurements from './Step2HealthMeasurements';
 import Step3LifestyleFactors from './Step3LifestyleFactors';
+import Step3EnhancedLabs from './Step3EnhancedLabs';
+import Step4LifestyleSocial from './Step4LifestyleSocial';
 
 const Calculator: React.FC = () => {
   const navigate = useNavigate();
+  const [isCalculating, setIsCalculating] = useState(false);
   const {
     formData,
     errors,
@@ -18,10 +21,13 @@ const Calculator: React.FC = () => {
     markStepCompleted,
     validateStep,
     getPatientParams,
+    switchAlgorithm,
+    getStepCount,
+    getStepTitle,
   } = useFormState();
 
-  const stepTitles = ['Demographics', 'Health Metrics', 'Lifestyle'];
-  const totalSteps = 3;
+  const totalSteps = getStepCount();
+  const stepTitles = Array.from({ length: totalSteps }, (_, i) => getStepTitle(i + 1));
 
   const handleNext = () => {
     if (validateStep(formData.currentStep)) {
@@ -42,20 +48,43 @@ const Calculator: React.FC = () => {
     }
   };
 
-  const handleCalculateRisk = () => {
+  const handleCalculateRisk = async () => {
+    setIsCalculating(true);
+    
     try {
       const patientParams = getPatientParams();
-      const result = pceCalculator.calculateRisk(patientParams);
       
-      // Store result in localStorage for Results page
-      localStorage.setItem('bioprognostika_riskResult', JSON.stringify(result));
+      // Configure the algorithm
+      switchToAlgorithm(formData.selectedAlgorithm || 'PREVENT');
+      enableAlgorithmComparison(true); // Enable comparison for educational purposes
+      
+      // Calculate risk with the configured algorithm
+      const result = await configuredRiskCalculator.calculateRisk(patientParams);
+      
+      // Store result and algorithm info in localStorage for Results page
+      const resultData = {
+        riskResult: result,
+        algorithmUsed: formData.selectedAlgorithm || 'PREVENT',
+        timestamp: new Date().toISOString(),
+        patientParams
+      };
+      
+      localStorage.setItem('bioprognostika_riskResult', JSON.stringify(resultData));
       
       // Navigate to results
       navigate('/results');
     } catch (error) {
       console.error('Error calculating risk:', error);
-      alert('There was an error calculating your risk. Please check your inputs and try again.');
+      alert(`There was an error calculating your risk: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your inputs and try again.`);
+    } finally {
+      setIsCalculating(false);
     }
+  };
+
+  const handleAlgorithmSwitch = (algorithm: 'PCE' | 'PREVENT') => {
+    console.log('Calculator handleAlgorithmSwitch called with:', algorithm);
+    console.log('Current formData.selectedAlgorithm:', formData.selectedAlgorithm);
+    switchAlgorithm(algorithm);
   };
 
   const isFirstStep = formData.currentStep === 1;
@@ -63,6 +92,8 @@ const Calculator: React.FC = () => {
   const hasErrors = Object.keys(errors).length > 0;
 
   const renderCurrentStep = () => {
+    const currentAlgorithm = formData.selectedAlgorithm || 'PCE';
+    
     switch (formData.currentStep) {
       case 1:
         return (
@@ -81,8 +112,28 @@ const Calculator: React.FC = () => {
           />
         );
       case 3:
+        // For PREVENT: Enhanced Labs; For PCE: Lifestyle Factors
+        if (currentAlgorithm === 'PREVENT') {
+          return (
+            <Step3EnhancedLabs
+              formData={formData}
+              errors={errors}
+              updateField={updateField}
+            />
+          );
+        } else {
+          return (
+            <Step3LifestyleFactors
+              formData={formData}
+              errors={errors}
+              updateField={updateField}
+            />
+          );
+        }
+      case 4:
+        // Only for PREVENT: Lifestyle & Social Factors
         return (
-          <Step3LifestyleFactors
+          <Step4LifestyleSocial
             formData={formData}
             errors={errors}
             updateField={updateField}
@@ -104,15 +155,34 @@ const Calculator: React.FC = () => {
                 Bioprognostika Health Prediction
               </h1>
               <p className="text-prediction-600 mt-1 font-medium">
-                Advanced cardiovascular risk modeling • Step {formData.currentStep} of {totalSteps}
+                Advanced cardiovascular risk modeling • Step {formData.currentStep} of {totalSteps} • Current: {formData.selectedAlgorithm}
               </p>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => navigate('/')}
-            >
-              ← Back to Home
-            </Button>
+            <div className="flex items-center space-x-4">
+              {/* Algorithm Selector */}
+              <AlgorithmToggle
+                selectedAlgorithm={formData.selectedAlgorithm || 'PCE'}
+                onAlgorithmChange={handleAlgorithmSwitch}
+                disabled={isCalculating}
+              />
+              <Button
+                variant="outline"
+                onClick={() => navigate('/')}
+              >
+                ← Back to Home
+              </Button>
+            </div>
+          </div>
+          
+          {/* Algorithm Info */}
+          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
+            <div className="text-sm text-blue-800">
+              <strong>{(formData.selectedAlgorithm || 'PCE') === 'PREVENT' ? 'PREVENT 2024:' : 'PCE 2013:'}</strong>
+              {(formData.selectedAlgorithm || 'PCE') === 'PREVENT' 
+                ? ' Enhanced algorithm with kidney function, providing both 10-year and 30-year cardiovascular risk estimates (Ages 30-79)'
+                : ' Traditional Pooled Cohort Equations for 10-year cardiovascular risk assessment (Ages 40-79)'
+              }
+            </div>
           </div>
         </div>
       </div>
@@ -158,9 +228,10 @@ const Calculator: React.FC = () => {
               
               <Button
                 onClick={handleNext}
-                disabled={hasErrors}
+                disabled={hasErrors || isCalculating}
+                loading={isCalculating}
               >
-                {isLastStep ? 'Calculate My Risk →' : 'Next →'}
+                {isLastStep ? (isCalculating ? 'Calculating...' : 'Calculate My Risk →') : 'Next →'}
               </Button>
             </div>
           </div>

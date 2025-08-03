@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Disclaimer } from '@/components/ui';
+import { Button, Card, Disclaimer, ReferenceBadge, CitationTooltip, ClinicalEvidencePanel } from '@/components/ui';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -66,7 +66,10 @@ const LandingPage: React.FC = () => {
           </div>
           
           <div className="text-sm text-neutral-500">
-            Trusted by 50,000+ health-conscious individuals • Ages 40-79 • No registration required
+            Trusted by 50,000+ health-conscious individuals • 
+            <CitationTooltip referenceId="pce-age-validation">
+              <span className="underline decoration-dotted">Ages 40-79</span>
+            </CitationTooltip> • No registration required
           </div>
         </div>
       </div>
@@ -92,7 +95,10 @@ const LandingPage: React.FC = () => {
                 Predictive Intelligence
               </h3>
               <p className="medical-body text-neutral-600 mb-4">
-                See your health 10 years ahead using validated clinical algorithms based on extensive cardiovascular research.
+                See your health 10 years ahead using validated clinical algorithms 
+                <CitationTooltip referenceId="pce-development">
+                  <span className="underline decoration-dotted">based on extensive cardiovascular research</span>
+                </CitationTooltip>.
               </p>
               <div className="text-sm text-prediction-600 font-medium">
                 Crystal ball for your health →
@@ -109,7 +115,9 @@ const LandingPage: React.FC = () => {
                 Clinical-Grade Accuracy
               </h3>
               <p className="text-neutral-600 mb-4">
-                Medical-quality algorithms validated against 25+ years of cardiovascular research and real-world outcomes.
+                <CitationTooltip referenceId="pce-validation">
+                  <span className="underline decoration-dotted">Medical-quality algorithms validated against 25+ years of cardiovascular research</span>
+                </CitationTooltip> and real-world outcomes.
               </p>
               <div className="text-sm text-precision-600 font-medium">
                 Professional tools in your hands →
@@ -158,14 +166,28 @@ const LandingPage: React.FC = () => {
                     Pooled Cohort Equations (PCE)
                   </h3>
                   <p className="medical-content text-neutral-700 mb-4">
-                    Bioprognostika implements the 2013 ACC/AHA Pooled Cohort Equations, validated against 
-                    24,626 participants from multiple large-scale epidemiological studies including the 
+                    Bioprognostika implements the 
+                    <CitationTooltip referenceId="pce-2013-guideline">
+                      <span className="underline decoration-dotted">2013 ACC/AHA Pooled Cohort Equations</span>
+                    </CitationTooltip>, validated against 
+                    <CitationTooltip referenceId="pce-cohort-studies">
+                      <span className="underline decoration-dotted">24,626 participants from multiple large-scale epidemiological studies</span>
+                    </CitationTooltip> including the 
                     Framingham Heart Study, ARIC, CHS, and CARDIA cohorts.
+                    <ReferenceBadge referenceId="pce-2013-guideline" className="ml-2" />
                   </p>
                   <div className="text-sm text-neutral-600 space-y-2">
                     <p><strong>Race/Gender-Specific Coefficients:</strong> Four distinct statistical models</p>
-                    <p><strong>Validation Period:</strong> 30+ years of follow-up data</p>
-                    <p><strong>C-Statistic:</strong> 0.71-0.82 (good discrimination)</p>
+                    <p><strong>Validation Period:</strong> 
+                      <CitationTooltip referenceId="pce-validation-period">
+                        <span className="underline decoration-dotted">30+ years of follow-up data</span>
+                      </CitationTooltip>
+                    </p>
+                    <p><strong>C-Statistic:</strong> 
+                      <CitationTooltip referenceId="pce-c-statistic">
+                        <span className="underline decoration-dotted">0.71-0.82 (good discrimination)</span>
+                      </CitationTooltip>
+                    </p>
                   </div>
                 </div>
 
@@ -177,7 +199,10 @@ const LandingPage: React.FC = () => {
                     Mathematical Implementation
                   </h3>
                   <p className="medical-content text-neutral-700 mb-4">
-                    Our TypeScript implementation uses Cox proportional hazards regression with 
+                    Our TypeScript implementation uses 
+                    <CitationTooltip referenceId="cox-regression">
+                      <span className="underline decoration-dotted">Cox proportional hazards regression</span>
+                    </CitationTooltip> with 
                     exponential survival functions. Each risk factor receives a coefficient weight 
                     based on population-specific hazard ratios.
                   </p>
@@ -198,31 +223,50 @@ const LandingPage: React.FC = () => {
                   Evidence-Based Intervention Modeling
                 </h3>
                 <p className="medical-content text-neutral-700 mb-6">
-                  Our "what-if" scenarios apply evidence-based risk reduction factors from meta-analyses 
-                  and randomized controlled trials. Each intervention modifies the baseline PCE calculation 
+                  Our "what-if" scenarios apply 
+                  <CitationTooltip referenceId="evidence-based-interventions">
+                    <span className="underline decoration-dotted">evidence-based risk reduction factors from meta-analyses 
+                  and randomized controlled trials</span>
+                  </CitationTooltip>. Each intervention modifies the baseline PCE calculation 
                   using clinically validated effect sizes.
                 </p>
                 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   <div className="bg-white p-4 rounded-xl border border-neutral-200">
                     <h4 className="font-medium text-neutral-900 mb-2">Smoking Cessation</h4>
-                    <p className="text-sm text-neutral-600">35% risk reduction<br />
-                    <span className="text-xs text-neutral-500">Critchley & Capewell 2003</span></p>
+                    <p className="text-sm text-neutral-600">
+                      <CitationTooltip referenceId="smoking-cessation-rr">
+                        <span className="underline decoration-dotted">35% risk reduction</span>
+                      </CitationTooltip><br />
+                      <ReferenceBadge referenceId="smoking-cessation-rr" size="sm" />
+                    </p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-neutral-200">
                     <h4 className="font-medium text-neutral-900 mb-2">BP Management</h4>
-                    <p className="text-sm text-neutral-600">22% per 10mmHg<br />
-                    <span className="text-xs text-neutral-500">Ettehad et al. 2016</span></p>
+                    <p className="text-sm text-neutral-600">
+                      <CitationTooltip referenceId="bp-reduction-rr">
+                        <span className="underline decoration-dotted">22% per 10mmHg</span>
+                      </CitationTooltip><br />
+                      <ReferenceBadge referenceId="bp-reduction-rr" size="sm" />
+                    </p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-neutral-200">
                     <h4 className="font-medium text-neutral-900 mb-2">Physical Activity</h4>
-                    <p className="text-sm text-neutral-600">25% risk reduction<br />
-                    <span className="text-xs text-neutral-500">Li et al. 2012</span></p>
+                    <p className="text-sm text-neutral-600">
+                      <CitationTooltip referenceId="physical-activity-rr">
+                        <span className="underline decoration-dotted">25% risk reduction</span>
+                      </CitationTooltip><br />
+                      <ReferenceBadge referenceId="physical-activity-rr" size="sm" />
+                    </p>
                   </div>
                   <div className="bg-white p-4 rounded-xl border border-neutral-200">
                     <h4 className="font-medium text-neutral-900 mb-2">Statin Therapy</h4>
-                    <p className="text-sm text-neutral-600">25% risk reduction<br />
-                    <span className="text-xs text-neutral-500">CTT Collaboration 2010</span></p>
+                    <p className="text-sm text-neutral-600">
+                      <CitationTooltip referenceId="statin-therapy-rr">
+                        <span className="underline decoration-dotted">25% risk reduction</span>
+                      </CitationTooltip><br />
+                      <ReferenceBadge referenceId="statin-therapy-rr" size="sm" />
+                    </p>
                   </div>
                 </div>
               </div>
@@ -252,6 +296,17 @@ const LandingPage: React.FC = () => {
               </div>
             </div>
 
+            {/* Clinical Evidence Panel */}
+            <div className="bg-gradient-to-r from-healing-sage/10 to-primary-50/30 p-8 rounded-2xl border border-healing-sage/20 mb-12">
+              <h3 className="medical-heading-secondary text-center text-neutral-900 mb-6 flex items-center justify-center">
+                <svg className="w-6 h-6 mr-3 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                </svg>
+                Clinical Evidence & References
+              </h3>
+              <ClinicalEvidencePanel />
+            </div>
+
             {/* Minimal FAQ Toggles */}
             <div className="border-t border-neutral-200 pt-8">
               <h3 className="medical-heading-secondary text-center text-neutral-900 mb-6">
@@ -262,7 +317,11 @@ const LandingPage: React.FC = () => {
                   <summary className="cursor-pointer p-4 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors">
                     <span className="font-medium text-neutral-900">Who should use this calculator?</span>
                   </summary>
-                  <p className="p-4 text-neutral-700 text-sm">Adults aged 40-79 without known cardiovascular disease. Particularly valuable for clinicians, researchers, and individuals with risk factors.</p>
+                  <p className="p-4 text-neutral-700 text-sm">
+                    <CitationTooltip referenceId="pce-age-validation">
+                      <span className="underline decoration-dotted">Adults aged 40-79</span>
+                    </CitationTooltip> without known cardiovascular disease. Particularly valuable for clinicians, researchers, and individuals with risk factors.
+                  </p>
                 </details>
                 
                 <details className="group">
@@ -276,7 +335,11 @@ const LandingPage: React.FC = () => {
                   <summary className="cursor-pointer p-4 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors">
                     <span className="font-medium text-neutral-900">What are the limitations?</span>
                   </summary>
-                  <p className="p-4 text-neutral-700 text-sm">PCE validation is limited to ages 40-79, specific race categories, and 10-year timeframes. Not applicable for secondary prevention or known CVD.</p>
+                  <p className="p-4 text-neutral-700 text-sm">
+                    <CitationTooltip referenceId="pce-limitations">
+                      <span className="underline decoration-dotted">PCE validation is limited to ages 40-79, specific race categories, and 10-year timeframes</span>
+                    </CitationTooltip>. Not applicable for secondary prevention or known CVD.
+                  </p>
                 </details>
               </div>
             </div>
@@ -291,7 +354,11 @@ const LandingPage: React.FC = () => {
             <div className="bg-gradient-to-r from-prediction-50 to-primary-50 p-6 rounded-xl border border-prediction-200">
               <p className="mb-4 text-neutral-700">
                 Bioprognostika is an advanced health prediction platform that uses clinical-grade algorithms 
-                to model cardiovascular risk using the 2013 ACC/AHA Pooled Cohort Equations.
+                to model cardiovascular risk using the 
+                <CitationTooltip referenceId="pce-2013-guideline">
+                  <span className="underline decoration-dotted">2013 ACC/AHA Pooled Cohort Equations</span>
+                </CitationTooltip>.
+                <ReferenceBadge referenceId="pce-2013-guideline" className="ml-2" />
               </p>
               
               <div className="grid md:grid-cols-2 gap-6">
@@ -305,7 +372,11 @@ const LandingPage: React.FC = () => {
                   <ul className="text-sm text-neutral-600 space-y-1">
                     <li>• Predicts 10-year cardiovascular disease risk</li>
                     <li>• Models "what-if" lifestyle scenarios</li>
-                    <li>• Validated for adults aged 40-79 years</li>
+                    <li>• 
+                      <CitationTooltip referenceId="pce-age-validation">
+                        <span className="underline decoration-dotted">Validated for adults aged 40-79 years</span>
+                      </CitationTooltip>
+                    </li>
                     <li>• Uses evidence-based clinical algorithms</li>
                   </ul>
                 </div>

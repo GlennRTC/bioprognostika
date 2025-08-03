@@ -4,9 +4,22 @@
  * 
  * Educational Research Tool - Not for Clinical Use
  * Implements race and gender-specific risk calculations with lifestyle intervention modeling
+ * Refactored to implement RiskCalculatorAlgorithm interface
  */
 
-import { PatientParams, RiskResult, RiskCategory, InterventionRequest, InterventionScenario, InterventionEffect } from '@/types';
+import { 
+  PatientParams, 
+  PCEPatientParams,
+  RiskResult, 
+  RiskCategory, 
+  InterventionRequest, 
+  InterventionScenario, 
+  InterventionEffect,
+  RiskCalculatorAlgorithm,
+  ClinicalRecommendation,
+  ClinicalReference
+} from '@/types';
+import { CLINICAL_REFERENCES } from './clinicalUtils';
 
 // PCE Coefficients for different race/gender combinations
 interface PCECoefficients {
@@ -149,9 +162,18 @@ const INTERVENTION_EFFECTS: Record<string, InterventionEffect> = {
 };
 
 /**
- * Main PCE Risk Calculator Class
+ * PCE Risk Calculator Class implementing RiskCalculatorAlgorithm interface
  */
-export class PCERiskCalculator {
+export class PCERiskCalculator implements RiskCalculatorAlgorithm {
+  // Algorithm metadata
+  readonly name = 'PCE';
+  readonly version = '2013.1';
+  readonly ageRange = { min: 40, max: 79 };
+  readonly requiredParameters: (keyof PatientParams)[] = ['age', 'gender', 'race', 'systolicBP'];
+  readonly optionalParameters: (keyof PatientParams)[] = [
+    'diastolicBP', 'totalCholesterol', 'hdlCholesterol', 'diabetes', 'smoking', 'bpMedication', 'weight', 'height'
+  ];
+
   private coefficients = PCE_COEFFICIENTS;
   private defaults = POPULATION_DEFAULTS;
   private interventions = INTERVENTION_EFFECTS;
@@ -161,17 +183,23 @@ export class PCERiskCalculator {
    */
   calculateRisk(params: PatientParams): RiskResult {
     try {
+      // Convert to PCE-compatible parameters
+      const pceParams = this.convertToPCEParams(params);
+      
       // Validate and normalize inputs
-      const validated = this.validateInputs(params);
+      const validationResult = this.validateInputs(params);
+      if (!validationResult.isValid) {
+        throw new Error(validationResult.errors.join(', '));
+      }
       
       // Handle missing values with defaults
-      const complete = this.applyDefaults(validated);
+      const complete = this.applyDefaults({ ...pceParams, warnings: validationResult.warnings });
       
       // Calculate PCE risk
       const risk = this.computePCE(complete);
       
       // Format and return results
-      return this.formatResults(risk, complete);
+      return this.formatResults(risk, complete, params);
       
     } catch (error) {
       return {
@@ -180,6 +208,7 @@ export class PCERiskCalculator {
         risk: 0,
         riskCategory: this.getRiskCategory(0),
         confidence: 'standard',
+        algorithm: 'PCE',
         parameters: params,
         defaults_used: [],
         warnings: [],
@@ -190,16 +219,15 @@ export class PCERiskCalculator {
   }
 
   /**
-   * Validate input parameters
+   * Validate inputs with enhanced interface compliance
    */
-  private validateInputs(params: PatientParams): PatientParams & { warnings: string[] } {
+  validateInputs(params: PatientParams): { isValid: boolean; errors: string[]; warnings: string[] } {
     const errors: string[] = [];
     const warnings: string[] = [];
-    const validated = { ...params };
 
     // Required validations
-    if (!params.age || params.age < 40 || params.age > 79) {
-      errors.push('Age must be between 40-79 years for PCE validation');
+    if (!params.age || params.age < this.ageRange.min || params.age > this.ageRange.max) {
+      errors.push(`Age must be between ${this.ageRange.min}-${this.ageRange.max} years for PCE validation`);
     }
 
     if (!params.gender || !['male', 'female', 'non-binary'].includes(params.gender)) {
@@ -223,11 +251,126 @@ export class PCERiskCalculator {
       warnings.push('HDL cholesterol outside typical range (20-100 mg/dL)');
     }
 
-    if (errors.length > 0) {
-      throw new Error(`Validation errors: ${errors.join(', ')}`);
+    // Warn about unsupported PREVENT parameters
+    if (params.eGFR || params.creatinine) {
+      warnings.push('Kidney function parameters not used in PCE calculation. Consider PREVENT algorithm.');
     }
 
-    return { ...validated, warnings };
+    if (params.nonHdlCholesterol) {
+      warnings.push('Non-HDL cholesterol not used in PCE calculation. Consider PREVENT algorithm.');
+    }
+
+    if (params.statinUse !== undefined) {
+      warnings.push('Statin use not used in PCE calculation. Consider PREVENT algorithm.');
+    }
+
+    return {
+      isValid: errors.length === 0,
+      errors,
+      warnings
+    };
+  }
+
+  /**
+   * Convert enhanced PatientParams to PCE-compatible format
+   */
+  private convertToPCEParams(params: PatientParams): PCEPatientParams {
+    return {
+      age: params.age,
+      gender: params.gender,
+      race: params.race,
+      systolicBP: params.systolicBP,
+      diastolicBP: params.diastolicBP,
+      totalCholesterol: params.totalCholesterol,
+      hdlCholesterol: params.hdlCholesterol,
+      diabetes: params.diabetes,
+      smoking: params.smoking,
+      bpMedication: params.bpMedication,
+      weight: params.weight,
+      height: params.height
+    };
+  }
+
+  /**
+   * Get clinical recommendations based on risk result
+   */
+  getRecommendations(riskResult: RiskResult): ClinicalRecommendation[] {
+    const recommendations: ClinicalRecommendation[] = [];
+    const risk = riskResult.risk;
+
+    // Risk-based recommendations following 2019 AHA/ACC Guidelines
+    if (risk >= 20) {
+      recommendations.push({
+        category: 'medication',
+        priority: 'high',
+        recommendation: 'High-intensity statin therapy recommended',
+        evidence: 'Class I recommendation for ASCVD risk ≥20%',
+        reference: CLINICAL_REFERENCES['pce-2013']
+      });
+    } else if (risk >= 7.5) {
+      recommendations.push({
+        category: 'medication',
+        priority: 'medium',
+        recommendation: 'Consider statin therapy after clinician-patient discussion',
+        evidence: 'Class IIa recommendation for ASCVD risk 7.5-19.9%',
+        reference: CLINICAL_REFERENCES['pce-2013']
+      });
+    }
+
+    // Lifestyle recommendations for all risk levels
+    recommendations.push({
+      category: 'lifestyle',
+      priority: 'high',
+      recommendation: 'Heart-healthy lifestyle modifications',
+      evidence: 'Class I recommendation for all patients',
+      reference: CLINICAL_REFERENCES['pce-2013']
+    });
+
+    // Smoking cessation if applicable
+    if (riskResult.parameters.smoking) {
+      recommendations.push({
+        category: 'lifestyle',
+        priority: 'high',
+        recommendation: 'Smoking cessation counseling and support',
+        evidence: 'Reduces cardiovascular risk by ~35%',
+        reference: CLINICAL_REFERENCES['smoking-cessation']
+      });
+    }
+
+    // Blood pressure management
+    if (riskResult.parameters.systolicBP > 130) {
+      recommendations.push({
+        category: 'lifestyle',
+        priority: 'medium',
+        recommendation: 'Blood pressure management and monitoring',
+        evidence: 'Target <130/80 mmHg for most patients',
+        reference: CLINICAL_REFERENCES['pce-2013']
+      });
+    }
+
+    // Monitoring recommendations
+    if (risk >= 5) {
+      recommendations.push({
+        category: 'monitoring',
+        priority: 'medium',
+        recommendation: 'Annual cardiovascular risk reassessment',
+        evidence: 'Regular monitoring for intermediate to high-risk patients',
+        reference: CLINICAL_REFERENCES['pce-2013']
+      });
+    }
+
+    return recommendations;
+  }
+
+  /**
+   * Get clinical citations used by PCE algorithm
+   */
+  getCitations(): ClinicalReference[] {
+    return [
+      CLINICAL_REFERENCES['pce-2013'],
+      CLINICAL_REFERENCES['smoking-cessation'],
+      CLINICAL_REFERENCES['statin-therapy']
+    ];
   }
 
   /**
@@ -402,23 +545,14 @@ export class PCERiskCalculator {
   /**
    * Format final results
    */
-  private formatResults(riskData: any, params: any): RiskResult {
+  private formatResults(riskData: any, params: any, originalParams: PatientParams): RiskResult {
     return {
       success: true,
       risk: riskData.risk,
       riskCategory: riskData.riskCategory,
       confidence: riskData.confidence || 'standard',
-      parameters: {
-        age: params.age,
-        gender: params.gender,
-        race: params.race,
-        systolicBP: params.systolicBP,
-        totalCholesterol: params.totalCholesterol,
-        hdlCholesterol: params.hdlCholesterol,
-        diabetes: params.diabetes || false,
-        smoking: params.smoking || false,
-        bpMedication: params.bpMedication || false
-      },
+      algorithm: 'PCE',
+      parameters: originalParams, // Use original enhanced parameters
       defaults_used: params.defaults_used || [],
       warnings: params.warnings || [],
       interpretation: this.generateInterpretation(riskData.risk),

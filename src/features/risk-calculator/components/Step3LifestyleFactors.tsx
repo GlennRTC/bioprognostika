@@ -1,9 +1,10 @@
 import React from 'react';
 import { Input, Card, Disclaimer } from '@/components/ui';
 import { PatientParams } from '@/types';
+import { calculateBMI } from '../services/clinicalUtils';
 
 interface Step3LifestyleFactorsProps {
-  formData: Partial<PatientParams>;
+  formData: Partial<PatientParams> & { selectedAlgorithm?: 'PCE' | 'PREVENT' };
   errors: Record<string, string>;
   updateField: (field: keyof PatientParams, value: any) => void;
 }
@@ -13,8 +14,14 @@ const Step3LifestyleFactors: React.FC<Step3LifestyleFactorsProps> = ({
   errors,
   updateField,
 }) => {
+  // This component is used for PCE Step 3 (final step)
+  // For PREVENT, lifestyle factors are in Step 4
+  const subtitle = formData.selectedAlgorithm === 'PREVENT' 
+    ? "Step 3 of 4: Basic lifestyle factors"
+    : "Step 3 of 3: Your current lifestyle";
+
   return (
-    <Card variant="medical" title="Lifestyle Factors" subtitle="Step 3 of 3: Your current lifestyle">
+    <Card variant="medical" title="Lifestyle Factors" subtitle={subtitle}>
       <div className="space-y-6">
         {/* Smoking Status */}
         <div className="bg-red-50 p-4 rounded-xl border border-red-200">
@@ -91,7 +98,7 @@ const Step3LifestyleFactors: React.FC<Step3LifestyleFactorsProps> = ({
           {formData.weight && formData.height && (
             <div className="mt-4 p-3 bg-white rounded-lg border">
               {(() => {
-                const bmi = (formData.weight / (formData.height * formData.height)) * 703;
+                const bmi = calculateBMI(formData.weight, formData.height);
                 let category = '';
                 let color = '';
                 
@@ -112,7 +119,7 @@ const Step3LifestyleFactors: React.FC<Step3LifestyleFactorsProps> = ({
                 return (
                   <div className="text-sm">
                     <span className="text-neutral-600">BMI: </span>
-                    <span className="font-medium">{bmi.toFixed(1)}</span>
+                    <span className="font-medium">{bmi}</span>
                     <span className={`ml-2 font-medium ${color}`}>({category})</span>
                   </div>
                 );
@@ -122,9 +129,10 @@ const Step3LifestyleFactors: React.FC<Step3LifestyleFactorsProps> = ({
 
           <Disclaimer type="info" className="mt-4">
             <p className="text-sm">
-              <strong>Weight and BMI:</strong> While not directly used in the PCE calculation, 
-              weight information helps us provide more relevant lifestyle intervention scenarios 
-              for your "What-If" analysis.
+              <strong>Weight and BMI:</strong> {formData.selectedAlgorithm === 'PREVENT' 
+                ? 'Weight information helps provide more accurate cardiovascular risk assessment and personalized intervention recommendations.'
+                : 'While not directly used in the PCE calculation, weight information helps us provide more relevant lifestyle intervention scenarios for your "What-If" analysis.'
+              }
             </p>
           </Disclaimer>
         </div>

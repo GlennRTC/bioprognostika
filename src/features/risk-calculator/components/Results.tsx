@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Card, RiskIndicator, Button, Disclaimer } from '@/components/ui';
+import { Card, RiskIndicator, Button, Disclaimer, ReferenceBadge, CitationTooltip } from '@/components/ui';
 import { RiskResult } from '@/types';
 import InterventionScenarios from './InterventionScenarios';
 
@@ -164,7 +164,11 @@ Algorithm: 2013 ACC/AHA Pooled Cohort Equations
                 10-Year Cardiovascular Disease Risk
               </h2>
               <p className="text-neutral-600 mb-6">
-                Based on advanced biological modeling and clinical algorithms
+                Based on 
+                <CitationTooltip referenceId="pce-2013-guideline">
+                  <span className="underline decoration-dotted">advanced biological modeling and clinical algorithms</span>
+                </CitationTooltip>
+                <ReferenceBadge referenceId="pce-2013-guideline" className="ml-2" />
               </p>
               
               <div className="flex justify-center mb-6">

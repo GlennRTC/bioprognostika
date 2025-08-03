@@ -1,27 +1,49 @@
 import { useState } from 'react';
 import { useLocalStorage } from '@/hooks/useLocalStorage';
 import { PatientParams } from '@/types';
+import { getCurrentAlgorithmInfo } from '../services';
 
 interface FormState extends Partial<PatientParams> {
   currentStep: number;
   completedSteps: number[];
+  selectedAlgorithm: 'PCE' | 'PREVENT';
 }
 
 const initialFormState: FormState = {
   currentStep: 1,
   completedSteps: [],
-  // Required fields will be filled as user progresses
+  selectedAlgorithm: 'PCE', // Default to PCE for compatibility
+  
+  // Demographics (Required for both algorithms)
   age: undefined,
   gender: undefined,
   race: undefined,
+  
+  // Blood Pressure (Required for both)
   systolicBP: undefined,
-  // Optional fields with defaults handled by PCE algorithm
   diastolicBP: undefined,
+  bpMedication: false,
+  
+  // Cholesterol (Enhanced for PREVENT)
   totalCholesterol: undefined,
   hdlCholesterol: undefined,
+  nonHdlCholesterol: undefined, // NEW: Required for PREVENT
+  
+  // Medical Conditions
   diabetes: false,
   smoking: false,
-  bpMedication: false,
+  statinUse: undefined, // NEW: Required for PREVENT
+  
+  // Kidney Function (NEW: Required for PREVENT)
+  eGFR: undefined,
+  creatinine: undefined,
+  albuminCreatinineRatio: undefined,
+  
+  // Enhanced Optional Parameters
+  hba1c: undefined,
+  socialDeprivationIndex: undefined,
+  
+  // Physical Measurements
   weight: undefined,
   height: undefined,
 };
@@ -29,6 +51,14 @@ const initialFormState: FormState = {
 export function useFormState() {
   const [formData, setFormData] = useLocalStorage<FormState>('bioprognostika_formData', initialFormState);
   const [errors, setErrors] = useState<Record<string, string>>({});
+  
+  // Force initialization if selectedAlgorithm is missing
+  if (!formData.selectedAlgorithm) {
+    setFormData(prev => ({
+      ...prev,
+      selectedAlgorithm: 'PCE'
+    }));
+  }
 
   const updateField = (field: keyof PatientParams, value: any) => {
     setFormData(prev => ({
@@ -62,11 +92,16 @@ export function useFormState() {
 
   const validateStep = (step: number): boolean => {
     const newErrors: Record<string, string> = {};
+    const algorithm = formData.selectedAlgorithm;
+    const algorithmInfo = getCurrentAlgorithmInfo();
 
     switch (step) {
       case 1: // Basic Demographics
-        if (!formData.age || formData.age < 40 || formData.age > 79) {
-          newErrors.age = 'Age must be between 40-79 years';
+        // Age validation - different ranges for PCE vs PREVENT
+        const minAge = algorithm === 'PCE' ? 40 : 30;
+        const maxAge = 79;
+        if (!formData.age || formData.age < minAge || formData.age > maxAge) {
+          newErrors.age = `Age must be between ${minAge}-${maxAge} years for ${algorithm}`;
         }
         if (!formData.gender) {
           newErrors.gender = 'Please select your gender';
@@ -76,13 +111,15 @@ export function useFormState() {
         }
         break;
 
-      case 2: // Health Measurements
+      case 2: // Health Measurements (Blood Pressure & Basic Labs)
         if (!formData.systolicBP || formData.systolicBP < 90 || formData.systolicBP > 200) {
           newErrors.systolicBP = 'Systolic blood pressure must be between 90-200 mmHg';
         }
         if (formData.diastolicBP && (formData.diastolicBP < 60 || formData.diastolicBP > 120)) {
           newErrors.diastolicBP = 'Diastolic blood pressure must be between 60-120 mmHg';
         }
+        
+        // Basic cholesterol validation
         if (formData.totalCholesterol && (formData.totalCholesterol < 130 || formData.totalCholesterol > 320)) {
           newErrors.totalCholesterol = 'Total cholesterol must be between 130-320 mg/dL';
         }
@@ -95,7 +132,53 @@ export function useFormState() {
         }
         break;
 
-      case 3: // Lifestyle Factors - All optional, no validation needed
+      case 3: // Enhanced Labs (PREVENT-specific)
+        if (algorithm === 'PREVENT') {
+          // Non-HDL cholesterol validation for PREVENT
+          if (!formData.nonHdlCholesterol && (!formData.totalCholesterol || !formData.hdlCholesterol)) {
+            newErrors.nonHdlCholesterol = 'Non-HDL cholesterol is required (or provide both total and HDL cholesterol)';
+          }
+          if (formData.nonHdlCholesterol && (formData.nonHdlCholesterol < 100 || formData.nonHdlCholesterol > 300)) {
+            newErrors.nonHdlCholesterol = 'Non-HDL cholesterol must be between 100-300 mg/dL';
+          }
+
+          // Kidney function validation for PREVENT
+          if (!formData.eGFR && !formData.creatinine) {
+            newErrors.eGFR = 'Either eGFR or serum creatinine is required for PREVENT';
+          }
+          if (formData.eGFR && (formData.eGFR < 10 || formData.eGFR > 150)) {
+            newErrors.eGFR = 'eGFR must be between 10-150 mL/min/1.73m²';
+          }
+          if (formData.creatinine && (formData.creatinine < 0.3 || formData.creatinine > 10)) {
+            newErrors.creatinine = 'Serum creatinine must be between 0.3-10 mg/dL';
+          }
+
+          // Statin use validation for PREVENT
+          if (formData.statinUse === undefined) {
+            newErrors.statinUse = 'Please specify current statin use status';
+          }
+
+          // Optional parameter validation
+          if (formData.hba1c && (formData.hba1c < 4 || formData.hba1c > 15)) {
+            newErrors.hba1c = 'HbA1c must be between 4-15%';
+          }
+          if (formData.albuminCreatinineRatio && (formData.albuminCreatinineRatio < 0 || formData.albuminCreatinineRatio > 1000)) {
+            newErrors.albuminCreatinineRatio = 'Albumin-creatinine ratio must be between 0-1000 mg/g';
+          }
+        }
+        break;
+
+      case 4: // Lifestyle Factors - Enhanced validation
+        // Optional lifestyle validations
+        if (formData.weight && (formData.weight < 50 || formData.weight > 500)) {
+          newErrors.weight = 'Weight must be between 50-500 lbs';
+        }
+        if (formData.height && (formData.height < 36 || formData.height > 96)) {
+          newErrors.height = 'Height must be between 36-96 inches';
+        }
+        if (formData.socialDeprivationIndex && (formData.socialDeprivationIndex < 0 || formData.socialDeprivationIndex > 100)) {
+          newErrors.socialDeprivationIndex = 'Social deprivation index must be between 0-100';
+        }
         break;
     }
 
@@ -108,21 +191,82 @@ export function useFormState() {
     setErrors({});
   };
 
+  const switchAlgorithm = (algorithm: 'PCE' | 'PREVENT') => {
+    console.log('Switching algorithm from', formData.selectedAlgorithm, 'to', algorithm);
+    
+    // Create a new form state with the algorithm change and reset to step 1
+    const newFormState: FormState = {
+      ...initialFormState,
+      selectedAlgorithm: algorithm,
+      currentStep: 1,
+      completedSteps: [],
+      // Preserve basic demographics if they exist
+      age: formData.age,
+      gender: formData.gender,
+      race: formData.race,
+    };
+    
+    setFormData(newFormState);
+    setErrors({});
+  };
+
+  const getStepCount = (): number => {
+    // Dynamic step count based on selected algorithm
+    return formData.selectedAlgorithm === 'PREVENT' ? 4 : 3;
+  };
+
   const getPatientParams = (): PatientParams => {
     return {
+      // Demographics
       age: formData.age!,
       gender: formData.gender!,
       race: formData.race!,
+      
+      // Blood Pressure
       systolicBP: formData.systolicBP!,
       diastolicBP: formData.diastolicBP,
+      bpMedication: formData.bpMedication || false,
+      
+      // Cholesterol
       totalCholesterol: formData.totalCholesterol,
       hdlCholesterol: formData.hdlCholesterol,
+      nonHdlCholesterol: formData.nonHdlCholesterol,
+      
+      // Medical Conditions
       diabetes: formData.diabetes || false,
       smoking: formData.smoking || false,
-      bpMedication: formData.bpMedication || false,
+      statinUse: formData.statinUse,
+      
+      // Kidney Function
+      eGFR: formData.eGFR,
+      creatinine: formData.creatinine,
+      albuminCreatinineRatio: formData.albuminCreatinineRatio,
+      
+      // Enhanced Parameters
+      hba1c: formData.hba1c,
+      socialDeprivationIndex: formData.socialDeprivationIndex,
+      
+      // Physical Measurements
       weight: formData.weight,
       height: formData.height,
     };
+  };
+
+  const isStepRequired = (step: number): boolean => {
+    if (formData.selectedAlgorithm === 'PCE') {
+      return step <= 3; // PCE only needs 3 steps
+    }
+    return step <= 4; // PREVENT needs all 4 steps
+  };
+
+  const getStepTitle = (step: number): string => {
+    const titles = {
+      1: 'Demographics',
+      2: 'Health Measurements',
+      3: formData.selectedAlgorithm === 'PREVENT' ? 'Enhanced Laboratory Values' : 'Lifestyle Factors',
+      4: 'Lifestyle & Social Factors'
+    };
+    return titles[step as keyof typeof titles] || 'Unknown Step';
   };
 
   return {
@@ -134,5 +278,9 @@ export function useFormState() {
     validateStep,
     resetForm,
     getPatientParams,
+    switchAlgorithm,
+    getStepCount,
+    isStepRequired,
+    getStepTitle,
   };
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, RiskIndicator, Button } from '@/components/ui';
+import { Card, RiskIndicator, Button, ReferenceBadge, CitationTooltip } from '@/components/ui';
 import { InterventionScenario, PatientParams, InterventionRequest } from '@/types';
 import { pceCalculator } from '../services/pceAlgorithm';
 
