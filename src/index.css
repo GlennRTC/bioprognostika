@@ -1,0 +1,214 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* Healthcare-focused typography system for medical authority and trust */
+  html {
+    font-family: 'Source Sans Pro', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-neutral-50 text-neutral-900 antialiased font-medical-body;
+    /* Enhanced text rendering for medical readability */
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
+  /* Medical typography hierarchy */
+  .medical-brand {
+    @apply font-medical-brand font-semibold text-medical-brand;
+    /* Enhanced letter spacing for brand authority */
+    letter-spacing: -0.02em;
+  }
+  
+  .medical-hero {
+    @apply font-medical-brand font-bold text-4xl sm:text-5xl md:text-6xl;
+    /* Responsive brand typography */
+    line-height: 1.1;
+  }
+  
+  .medical-heading-primary {
+    @apply font-medical-heading font-semibold text-3xl;
+    /* Primary section headings */
+    letter-spacing: -0.025em;
+  }
+  
+  .medical-heading-secondary {
+    @apply font-medical-heading font-medium text-xl;
+    /* Secondary headings and subheadings */
+    letter-spacing: -0.015em;
+  }
+  
+  .medical-heading-tertiary {
+    @apply font-medical-heading font-medium text-lg;
+    /* Tertiary headings and UI labels */
+    letter-spacing: -0.01em;
+  }
+  
+  .medical-body-large {
+    @apply font-medical-body text-lg;
+    /* Emphasis body text */
+    line-height: 1.7;
+  }
+  
+  .medical-body {
+    @apply font-medical-body text-base;
+    /* Standard body text for medical content */
+    line-height: 1.6;
+  }
+  
+  .medical-body-small {
+    @apply font-medical-body text-sm;
+    /* Supporting text and captions */
+    line-height: 1.5;
+  }
+  
+  .medical-disclaimer {
+    @apply font-medical-body text-xs;
+    /* Medical disclaimers and fine print */
+    line-height: 1.4;
+    letter-spacing: 0.025em;
+  }
+  
+  .medical-ui {
+    @apply font-medical-ui;
+    /* Interactive UI elements */
+    letter-spacing: 0;
+  }
+  
+  /* Enhanced readability for healthcare context */
+  .medical-content {
+    @apply font-medical-body leading-relaxed;
+    /* Optimal line height for health information */
+    line-height: 1.65;
+  }
+  
+  .medical-emphasis {
+    @apply font-medical-heading font-medium;
+    /* Emphasis text within medical content */
+  }
+}
+
+@layer components {
+  /* Bioprognostika Medical-grade component styles */
+  .btn-primary {
+    @apply bg-gradient-to-r from-primary-500 to-prediction-600 hover:from-primary-600 hover:to-prediction-700 text-white font-medical-ui font-medium py-3 px-6 rounded-xl transition-all duration-300 shadow-medical hover:shadow-trust transform hover:scale-105;
+  }
+  
+  .btn-secondary {
+    @apply bg-white hover:bg-prediction-50 text-prediction-700 font-medical-ui font-medium py-3 px-6 rounded-xl border border-prediction-200 hover:border-prediction-300 transition-all duration-200;
+  }
+  
+  .card {
+    @apply bg-white rounded-2xl shadow-sm border border-neutral-200 p-6 transition-shadow duration-300 hover:shadow-md;
+  }
+  
+  .card-medical {
+    @apply bg-white rounded-2xl shadow-medical border border-prediction-100 p-6 transition-all duration-300 hover:shadow-trust;
+  }
+  
+  .input-field {
+    @apply w-full px-4 py-3 border border-neutral-300 rounded-xl focus:ring-2 focus:ring-prediction-500 focus:border-transparent transition-all duration-200 hover:border-neutral-400;
+  }
+  
+  .label-field {
+    @apply block text-sm font-medical-heading font-medium text-neutral-700 mb-2;
+  }
+  
+  /* Enhanced risk indicators with Bioprognostika branding */
+  .risk-indicator-low {
+    @apply bg-gradient-to-r from-medical-low to-primary-500 text-white shadow-lg;
+  }
+  
+  .risk-indicator-borderline {
+    @apply bg-gradient-to-r from-medical-borderline to-yellow-400 text-neutral-900 shadow-lg;
+  }
+  
+  .risk-indicator-intermediate {
+    @apply bg-gradient-to-r from-medical-intermediate to-orange-500 text-white shadow-lg;
+  }
+  
+  .risk-indicator-high {
+    @apply bg-gradient-to-r from-medical-high to-red-600 text-white shadow-lg;
+  }
+  
+  /* Enhanced disclaimer with trust elements */
+  .disclaimer {
+    @apply medical-disclaimer text-neutral-700 bg-gradient-to-r from-prediction-50 to-primary-50 p-4 rounded-xl border border-prediction-200;
+  }
+  
+  /* Trust and credibility indicators */
+  .trust-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medical-ui font-medium bg-prediction-100 text-prediction-700 border border-prediction-200;
+  }
+  
+  .clinical-grade-indicator {
+    @apply flex items-center text-sm text-precision-600 font-medical-heading font-medium;
+  }
+  
+  .clinical-enhanced-badge {
+    @apply bg-gradient-to-r from-intelligence-100 to-prediction-100 text-intelligence-700 px-3 py-1 rounded-full text-xs font-medical-ui font-medium border border-intelligence-200;
+  }
+  
+  /* Prediction-themed animations */
+  .prediction-glow {
+    @apply shadow-lg shadow-prediction-500/25 transition-shadow duration-500;
+  }
+  
+  .health-timeline {
+    @apply relative bg-gradient-to-r from-primary-50 via-prediction-50 to-intelligence-50 p-6 rounded-xl border border-prediction-200;
+  }
+  
+  /* Mobile-first responsive optimizations */
+  .mobile-touch-target {
+    @apply min-h-[48px] min-w-[48px] flex items-center justify-center;
+  }
+  
+  .mobile-hero-text {
+    @apply text-2xl sm:text-4xl md:text-6xl;
+  }
+  
+  .mobile-subtext {
+    @apply text-lg sm:text-xl md:text-2xl;
+  }
+  
+  .mobile-card-grid {
+    @apply grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8;
+  }
+  
+  .mobile-button-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 md:gap-4;
+  }
+  
+  .mobile-comparison-grid {
+    @apply grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4;
+  }
+  
+  /* Thumb-friendly mobile interactions */
+  .thumb-zone-button {
+    @apply px-6 py-4 text-base min-h-[48px] rounded-xl transition-all duration-200 active:scale-95;
+  }
+  
+  /* Mobile form optimizations */
+  .mobile-form-field {
+    @apply w-full px-4 py-4 text-base rounded-xl border-2 focus:ring-2 focus:ring-prediction-500 focus:border-transparent transition-all duration-200;
+  }
+  
+  /* Mobile-optimized risk visualization */
+  .mobile-risk-display {
+    @apply flex flex-col items-center space-y-4 p-6;
+  }
+  
+  /* Mobile navigation enhancements */
+  .mobile-nav-header {
+    @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 sm:gap-0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

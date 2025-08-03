@@ -1,0 +1,23 @@
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://bioprognostika.com/sitemap.xml
+
+# Crawl-delay for health content
+Crawl-delay: 1
+
+# Allow all content for health-focused search engines
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Block sensitive or duplicate content
+Disallow: /api/
+Disallow: /admin/
+Disallow: /*.json$
+
+# Medical content guidelines
+# This is educational health content following YMYL guidelines
