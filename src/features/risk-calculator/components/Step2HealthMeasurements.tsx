@@ -138,28 +138,6 @@ const Step2HealthMeasurements: React.FC<Step2HealthMeasurementsProps> = ({
               </span>
             </label>
 
-            {/* PREVENT-specific: Statin use */}
-            {formData.selectedAlgorithm === 'PREVENT' && (
-              <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-                <h5 className="text-md font-medium text-blue-900 mb-2">
-                  Current Medications (Required for PREVENT)
-                </h5>
-                <label className="flex items-center space-x-3">
-                  <input
-                    type="checkbox"
-                    checked={formData.statinUse || false}
-                    onChange={(e) => updateField('statinUse', e.target.checked)}
-                    className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-neutral-700">
-                    I am currently taking a statin medication (cholesterol-lowering drug)
-                  </span>
-                </label>
-                {errors.statinUse && (
-                  <p className="text-red-600 text-xs mt-1">{errors.statinUse}</p>
-                )}
-              </div>
-            )}
           </div>
         </div>
 

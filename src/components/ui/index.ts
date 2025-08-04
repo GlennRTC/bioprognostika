@@ -20,8 +20,19 @@ export { default as AlgorithmSelector } from './AlgorithmSelector';
 export { default as EnhancedRiskVisualization } from './EnhancedRiskVisualization';
 export { default as ClinicalEvidencePanel } from './ClinicalEvidencePanel';
 export { default as MedicalParameterGuide } from './MedicalParameterGuide';
+export { default as SDILookupGuide } from './SDILookupGuide';
 
 // Navigation Components
 export { default as Header } from './Header';
 export { default as HamburgerMenu } from './HamburgerMenu';
 export { default as AlgorithmToggle } from './AlgorithmToggle';
+
+// Landing Page Components
+export { default as AlgorithmComparisonSection } from './AlgorithmComparisonSection';
+export { default as ClinicalEvidenceSection } from './ClinicalEvidenceSection';
+export { default as SimplifiedFAQSection } from './SimplifiedFAQSection';
+
+// Calculator Components  
+export { default as AlgorithmInfoBanner } from './AlgorithmInfoBanner';
+export { default as StreamlinedFooter } from './StreamlinedFooter';
+export { default as SubtleMedicalTooltip } from './SubtleMedicalTooltip';

@@ -12,7 +12,7 @@ interface FormState extends Partial<PatientParams> {
 const initialFormState: FormState = {
   currentStep: 1,
   completedSteps: [],
-  selectedAlgorithm: 'PCE', // Default to PCE for compatibility
+  selectedAlgorithm: 'PREVENT', // Default to PREVENT (latest algorithm)
   
   // Demographics (Required for both algorithms)
   age: undefined,
@@ -132,38 +132,52 @@ export function useFormState() {
         }
         break;
 
-      case 3: // Enhanced Labs (PREVENT-specific)
+      case 3: // Enhanced Labs (PREVENT-specific) or Lifestyle (PCE)
         if (algorithm === 'PREVENT') {
-          // Non-HDL cholesterol validation for PREVENT
-          if (!formData.nonHdlCholesterol && (!formData.totalCholesterol || !formData.hdlCholesterol)) {
-            newErrors.nonHdlCholesterol = 'Non-HDL cholesterol is required (or provide both total and HDL cholesterol)';
+          // Non-HDL cholesterol validation for PREVENT - more flexible
+          if (!formData.nonHdlCholesterol) {
+            // Check if we can calculate it from total and HDL
+            if (formData.totalCholesterol && formData.hdlCholesterol) {
+              // Auto-calculate and don't error
+            } else {
+              newErrors.nonHdlCholesterol = 'Non-HDL cholesterol is required for PREVENT algorithm';
+            }
           }
-          if (formData.nonHdlCholesterol && (formData.nonHdlCholesterol < 100 || formData.nonHdlCholesterol > 300)) {
-            newErrors.nonHdlCholesterol = 'Non-HDL cholesterol must be between 100-300 mg/dL';
+          if (formData.nonHdlCholesterol && (formData.nonHdlCholesterol < 50 || formData.nonHdlCholesterol > 400)) {
+            newErrors.nonHdlCholesterol = 'Non-HDL cholesterol must be between 50-400 mg/dL';
           }
 
-          // Kidney function validation for PREVENT
+          // Kidney function validation for PREVENT - more flexible
           if (!formData.eGFR && !formData.creatinine) {
-            newErrors.eGFR = 'Either eGFR or serum creatinine is required for PREVENT';
+            newErrors.eGFR = 'Either eGFR or serum creatinine is required for PREVENT algorithm';
           }
-          if (formData.eGFR && (formData.eGFR < 10 || formData.eGFR > 150)) {
-            newErrors.eGFR = 'eGFR must be between 10-150 mL/min/1.73m²';
+          if (formData.eGFR && (formData.eGFR < 5 || formData.eGFR > 200)) {
+            newErrors.eGFR = 'eGFR must be between 5-200 mL/min/1.73m²';
           }
-          if (formData.creatinine && (formData.creatinine < 0.3 || formData.creatinine > 10)) {
-            newErrors.creatinine = 'Serum creatinine must be between 0.3-10 mg/dL';
+          if (formData.creatinine && (formData.creatinine < 0.1 || formData.creatinine > 15)) {
+            newErrors.creatinine = 'Serum creatinine must be between 0.1-15 mg/dL';
           }
 
           // Statin use validation for PREVENT
-          if (formData.statinUse === undefined) {
-            newErrors.statinUse = 'Please specify current statin use status';
+          if (formData.statinUse === undefined || formData.statinUse === null) {
+            newErrors.statinUse = 'Please specify if you are currently taking statin medication';
           }
 
-          // Optional parameter validation
-          if (formData.hba1c && (formData.hba1c < 4 || formData.hba1c > 15)) {
-            newErrors.hba1c = 'HbA1c must be between 4-15%';
+          // Optional parameter validation - more lenient
+          if (formData.hba1c && (formData.hba1c < 3 || formData.hba1c > 20)) {
+            newErrors.hba1c = 'HbA1c must be between 3-20%';
           }
-          if (formData.albuminCreatinineRatio && (formData.albuminCreatinineRatio < 0 || formData.albuminCreatinineRatio > 1000)) {
-            newErrors.albuminCreatinineRatio = 'Albumin-creatinine ratio must be between 0-1000 mg/g';
+          if (formData.albuminCreatinineRatio && (formData.albuminCreatinineRatio < 0 || formData.albuminCreatinineRatio > 5000)) {
+            newErrors.albuminCreatinineRatio = 'Albumin-creatinine ratio must be between 0-5000 mg/g';
+          }
+        } else {
+          // PCE Step 3 is lifestyle factors - no strict requirements
+          // Basic lifestyle validation for PCE
+          if (formData.weight && (formData.weight < 50 || formData.weight > 500)) {
+            newErrors.weight = 'Weight must be between 50-500 lbs';
+          }
+          if (formData.height && (formData.height < 48 || formData.height > 84)) {
+            newErrors.height = 'Height must be between 48-84 inches';
           }
         }
         break;
@@ -192,7 +206,6 @@ export function useFormState() {
   };
 
   const switchAlgorithm = (algorithm: 'PCE' | 'PREVENT') => {
-    console.log('Switching algorithm from', formData.selectedAlgorithm, 'to', algorithm);
     
     // Create a new form state with the algorithm change and reset to step 1
     const newFormState: FormState = {

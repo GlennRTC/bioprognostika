@@ -14,7 +14,9 @@ const Results: React.FC = () => {
     const storedResult = localStorage.getItem('bioprognostika_riskResult');
     if (storedResult) {
       try {
-        const result = JSON.parse(storedResult);
+        const parsedData = JSON.parse(storedResult);
+        // Handle both old format (direct riskResult) and new format (wrapped object)
+        const result = parsedData.riskResult || parsedData;
         setRiskResult(result);
       } catch (error) {
         console.error('Error parsing risk result:', error);
@@ -115,6 +117,30 @@ Algorithm: 2013 ACC/AHA Pooled Cohort Equations
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500 mx-auto mb-4"></div>
           <p className="text-neutral-600">Loading your results...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Additional safety check for required properties
+  if (!riskResult.risk || !riskResult.riskCategory) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-50 to-healing-mint/20 flex items-center justify-center">
+        <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 text-center">
+          <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-semibold text-neutral-900 mb-2">
+            Invalid Results Data
+          </h2>
+          <p className="text-neutral-600 mb-6">
+            The risk calculation results are incomplete or corrupted. Please try calculating your risk again.
+          </p>
+          <Button onClick={() => navigate('/calculator')}>
+            Return to Calculator
+          </Button>
         </div>
       </div>
     );

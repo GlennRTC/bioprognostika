@@ -249,9 +249,9 @@ export const CLINICAL_REFERENCES: Record<string, ClinicalReference> = {
     title: 'Development and Validation of the American Heart Association\'s PREVENT Equations',
     journal: 'Circulation',
     year: 2024,
-    pmid: '38000000', // Placeholder
+    pmid: '37947085', // Actual PMID for PREVENT publication
     doi: '10.1161/CIRCULATIONAHA.123.067626',
-    summary: 'PREVENT equations for 10- and 30-year cardiovascular risk prediction including kidney function.'
+    summary: 'PREVENT equations for 10- and 30-year cardiovascular risk prediction including kidney function and enhanced demographic representation.'
   },
   
   'pce-2013': {
@@ -285,6 +285,39 @@ export const CLINICAL_REFERENCES: Record<string, ClinicalReference> = {
     pmid: '21067804',
     doi: '10.1016/S0140-6736(10)61350-5',
     summary: 'Meta-analysis demonstrating LDL cholesterol reduction benefits for cardiovascular outcomes.'
+  },
+
+  'social-determinants-health': {
+    id: 'social-determinants-health',
+    authors: 'Havranek EP, Mujahid MS, Barr DA, et al.',
+    title: 'Social Determinants of Risk and Outcomes for Cardiovascular Disease',
+    journal: 'Circulation',
+    year: 2015,
+    pmid: '26199086',
+    doi: '10.1161/CIR.0000000000000228',
+    summary: 'AHA Scientific Statement on how social factors impact cardiovascular health and outcomes.'
+  },
+
+  'area-deprivation-index': {
+    id: 'area-deprivation-index',
+    authors: 'Kind AJH, Buckingham WR',
+    title: 'Making Neighborhood-Disadvantage Metrics Accessible',
+    journal: 'New England Journal of Medicine',
+    year: 2018,
+    pmid: '29562145',
+    doi: '10.1056/NEJMp1802313',
+    summary: 'Review of area-based socioeconomic measures including Area Deprivation Index for clinical use.'
+  },
+
+  'social-deprivation-cvd': {
+    id: 'social-deprivation-cvd',
+    authors: 'Churchwell K, Elkind MSV, Benjamin RM, et al.',
+    title: 'Call to Action: Structural Racism as a Fundamental Driver of Health Disparities',
+    journal: 'Circulation',
+    year: 2020,
+    pmid: '33170755',
+    doi: '10.1161/CIR.0000000000000936',
+    summary: 'AHA Presidential Advisory addressing structural racism and social determinants in cardiovascular health.'
   }
 };
 

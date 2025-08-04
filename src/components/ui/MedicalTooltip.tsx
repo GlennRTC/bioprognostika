@@ -266,15 +266,35 @@ export const MEDICAL_PARAMETERS: Record<string, MedicalParameter> = {
     }
   },
   socialDeprivationIndex: {
-    name: 'Social Deprivation Index',
-    description: 'A composite measure of social disadvantage that includes factors like poverty, housing quality, transportation access, and educational attainment.',
-    normalRange: 'Varies by region (0-100 scale)',
-    unit: 'Percentile',
-    clinicalSignificance: 'Social determinants of health significantly impact cardiovascular risk. Higher social deprivation is associated with increased rates of heart disease, stroke, and poor health outcomes.',
+    name: 'Social Deprivation Index (SDI)',
+    description: 'A comprehensive measure of neighborhood-level social disadvantage based on multiple socioeconomic factors including income, education, employment, housing quality, and household composition. The SDI helps identify areas where residents may face additional barriers to achieving optimal health.',
+    normalRange: '0-100 percentile (0 = least deprived, 100 = most deprived)',
+    unit: 'Percentile rank',
+    clinicalSignificance: 'Social determinants of health are powerful predictors of cardiovascular outcomes. Higher SDI scores indicate greater social disadvantage, which is associated with increased rates of hypertension, diabetes, heart disease, stroke, and cardiovascular mortality. The PREVENT algorithm incorporates SDI to provide more personalized risk assessment that accounts for social and environmental factors beyond traditional clinical markers.',
     warningThresholds: {
-      high: 80,
-      message: 'High social deprivation may require additional support and resources for optimal health outcomes'
-    }
+      high: 75,
+      message: 'High social deprivation (≥75th percentile) may indicate need for enhanced support services and community-based interventions'
+    },
+    references: [
+      {
+        id: 'social-determinants-health',
+        authors: 'Havranek EP, Mujahid MS, Barr DA, et al.',
+        title: 'Social Determinants of Risk and Outcomes for Cardiovascular Disease',
+        journal: 'Circulation',
+        year: 2015,
+        pmid: '26199086',
+        doi: '10.1161/CIR.0000000000000228'
+      },
+      {
+        id: 'area-deprivation-index',
+        authors: 'Kind AJH, Buckingham WR',
+        title: 'Making Neighborhood-Disadvantage Metrics Accessible',
+        journal: 'New England Journal of Medicine',
+        year: 2018,
+        pmid: '29562145',
+        doi: '10.1056/NEJMp1802313'
+      }
+    ]
   },
   creatinine: {
     name: 'Serum Creatinine',

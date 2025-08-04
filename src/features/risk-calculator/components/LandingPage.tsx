@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button, Card, Disclaimer, ReferenceBadge, CitationTooltip, ClinicalEvidencePanel } from '@/components/ui';
+import { Button, Card, Disclaimer, ReferenceBadge, CitationTooltip } from '@/components/ui';
+import AlgorithmComparisonSection from '@/components/ui/AlgorithmComparisonSection';
+import ClinicalEvidenceSection from '@/components/ui/ClinicalEvidenceSection';
+import SimplifiedFAQSection from '@/components/ui/SimplifiedFAQSection';
 
 const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -14,11 +17,11 @@ const LandingPage: React.FC = () => {
             Bioprognostika
           </h1>
           <p className="medical-body-large text-prediction-700 mb-4 text-balance font-medical-heading font-medium">
-            See Your Health Future Before It Happens
+            See Your Health Future in 2 Minutes
           </p>
           <p className="medical-body-large text-neutral-600 mb-8 max-w-3xl mx-auto text-balance">
-            Advanced cardiovascular risk prediction using evidence-based clinical algorithms and biological modeling. 
-            Model your health choices before you make them.
+            Get your personalized 10-year cardiovascular risk assessment using the latest clinical algorithms. 
+            Discover exactly how lifestyle changes can improve your health future.
           </p>
           
           {/* Trust Indicators */}
@@ -68,8 +71,8 @@ const LandingPage: React.FC = () => {
           <div className="text-sm text-neutral-500">
             Trusted by 50,000+ health-conscious individuals • 
             <CitationTooltip referenceId="pce-age-validation">
-              <span className="underline decoration-dotted">Ages 40-79</span>
-            </CitationTooltip> • No registration required
+              <span className="underline decoration-dotted">Ages 30-79</span>
+            </CitationTooltip> • No registration required • Results in 2 minutes
           </div>
         </div>
       </div>
@@ -144,7 +147,7 @@ const LandingPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Technical Deep Dive Section for SEO */}
+      {/* Algorithm Overview Section - Simplified */}
       <div id="how-it-works" className="bg-white border-t border-neutral-200">
         <div className="container mx-auto px-4 py-16">
           <div className="max-w-5xl mx-auto">
@@ -152,196 +155,23 @@ const LandingPage: React.FC = () => {
               How Bioprognostika Works
             </h2>
             <p className="medical-body-large text-center text-neutral-600 mb-12">
-              Clinical-grade cardiovascular risk prediction using validated statistical algorithms
+              Choose from two validated clinical algorithms for comprehensive cardiovascular risk prediction
             </p>
             
-            {/* Technical Implementation */}
-            <div className="prose prose-lg max-w-none mb-12">
-              <div className="grid md:grid-cols-2 gap-8 mb-12">
-                <div className="bg-gradient-to-br from-prediction-50 to-primary-50 p-8 rounded-2xl border border-prediction-200">
-                  <h3 className="medical-heading-secondary text-neutral-900 mb-4 flex items-center">
-                    <svg className="w-6 h-6 mr-3 text-prediction-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                    </svg>
-                    Pooled Cohort Equations (PCE)
-                  </h3>
-                  <p className="medical-content text-neutral-700 mb-4">
-                    Bioprognostika implements the 
-                    <CitationTooltip referenceId="pce-2013-guideline">
-                      <span className="underline decoration-dotted">2013 ACC/AHA Pooled Cohort Equations</span>
-                    </CitationTooltip>, validated against 
-                    <CitationTooltip referenceId="pce-cohort-studies">
-                      <span className="underline decoration-dotted">24,626 participants from multiple large-scale epidemiological studies</span>
-                    </CitationTooltip> including the 
-                    Framingham Heart Study, ARIC, CHS, and CARDIA cohorts.
-                    <ReferenceBadge referenceId="pce-2013-guideline" className="ml-2" />
-                  </p>
-                  <div className="text-sm text-neutral-600 space-y-2">
-                    <p><strong>Race/Gender-Specific Coefficients:</strong> Four distinct statistical models</p>
-                    <p><strong>Validation Period:</strong> 
-                      <CitationTooltip referenceId="pce-validation-period">
-                        <span className="underline decoration-dotted">30+ years of follow-up data</span>
-                      </CitationTooltip>
-                    </p>
-                    <p><strong>C-Statistic:</strong> 
-                      <CitationTooltip referenceId="pce-c-statistic">
-                        <span className="underline decoration-dotted">0.71-0.82 (good discrimination)</span>
-                      </CitationTooltip>
-                    </p>
-                  </div>
-                </div>
-
-                <div className="bg-gradient-to-br from-precision-50 to-intelligence-50 p-8 rounded-2xl border border-precision-200">
-                  <h3 className="medical-heading-secondary text-neutral-900 mb-4 flex items-center">
-                    <svg className="w-6 h-6 mr-3 text-precision-600" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M10 2L3 7v11a2 2 0 002 2h10a2 2 0 002-2V7l-7-5zM10 9a3 3 0 100 6 3 3 0 000-6z" clipRule="evenodd" />
-                    </svg>
-                    Mathematical Implementation
-                  </h3>
-                  <p className="medical-content text-neutral-700 mb-4">
-                    Our TypeScript implementation uses 
-                    <CitationTooltip referenceId="cox-regression">
-                      <span className="underline decoration-dotted">Cox proportional hazards regression</span>
-                    </CitationTooltip> with 
-                    exponential survival functions. Each risk factor receives a coefficient weight 
-                    based on population-specific hazard ratios.
-                  </p>
-                  <div className="text-sm text-neutral-600 space-y-2">
-                    <p><strong>Algorithm:</strong> Risk = 1 - S₀(t)^exp(Σβᵢxᵢ - μ)</p>
-                    <p><strong>Variables:</strong> Age, gender, race, SBP, cholesterol, diabetes, smoking</p>
-                    <p><strong>Output:</strong> 10-year ASCVD probability (0-100%)</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Intervention Modeling */}
-              <div className="bg-gradient-to-r from-intelligence-50 to-healing-sage/20 p-8 rounded-2xl border border-intelligence-200 mb-8">
-                <h3 className="medical-heading-secondary text-neutral-900 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-intelligence-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 3a1 1 0 000 2v8a2 2 0 002 2h2.586l-1.293 1.293a1 1 0 101.414 1.414L10 15.414l2.293 2.293a1 1 0 001.414-1.414L12.414 15H15a2 2 0 002-2V5a1 1 0 100-2H3zm11.707 4.707a1 1 0 00-1.414-1.414L10 9.586 8.707 8.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Evidence-Based Intervention Modeling
-                </h3>
-                <p className="medical-content text-neutral-700 mb-6">
-                  Our "what-if" scenarios apply 
-                  <CitationTooltip referenceId="evidence-based-interventions">
-                    <span className="underline decoration-dotted">evidence-based risk reduction factors from meta-analyses 
-                  and randomized controlled trials</span>
-                  </CitationTooltip>. Each intervention modifies the baseline PCE calculation 
-                  using clinically validated effect sizes.
-                </p>
-                
-                <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200">
-                    <h4 className="font-medium text-neutral-900 mb-2">Smoking Cessation</h4>
-                    <p className="text-sm text-neutral-600">
-                      <CitationTooltip referenceId="smoking-cessation-rr">
-                        <span className="underline decoration-dotted">35% risk reduction</span>
-                      </CitationTooltip><br />
-                      <ReferenceBadge referenceId="smoking-cessation-rr" size="sm" />
-                    </p>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200">
-                    <h4 className="font-medium text-neutral-900 mb-2">BP Management</h4>
-                    <p className="text-sm text-neutral-600">
-                      <CitationTooltip referenceId="bp-reduction-rr">
-                        <span className="underline decoration-dotted">22% per 10mmHg</span>
-                      </CitationTooltip><br />
-                      <ReferenceBadge referenceId="bp-reduction-rr" size="sm" />
-                    </p>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200">
-                    <h4 className="font-medium text-neutral-900 mb-2">Physical Activity</h4>
-                    <p className="text-sm text-neutral-600">
-                      <CitationTooltip referenceId="physical-activity-rr">
-                        <span className="underline decoration-dotted">25% risk reduction</span>
-                      </CitationTooltip><br />
-                      <ReferenceBadge referenceId="physical-activity-rr" size="sm" />
-                    </p>
-                  </div>
-                  <div className="bg-white p-4 rounded-xl border border-neutral-200">
-                    <h4 className="font-medium text-neutral-900 mb-2">Statin Therapy</h4>
-                    <p className="text-sm text-neutral-600">
-                      <CitationTooltip referenceId="statin-therapy-rr">
-                        <span className="underline decoration-dotted">25% risk reduction</span>
-                      </CitationTooltip><br />
-                      <ReferenceBadge referenceId="statin-therapy-rr" size="sm" />
-                    </p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Technical Architecture */}
-              <div className="bg-gradient-to-r from-neutral-50 to-prediction-50/30 p-8 rounded-2xl border border-neutral-200">
-                <h3 className="medical-heading-secondary text-neutral-900 mb-4 flex items-center">
-                  <svg className="w-6 h-6 mr-3 text-neutral-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414zM11 12a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
-                  </svg>
-                  Privacy-First Architecture
-                </h3>
-                <div className="grid md:grid-cols-3 gap-6">
-                  <div>
-                    <h4 className="font-medium text-neutral-900 mb-2">Client-Side Processing</h4>
-                    <p className="text-sm text-neutral-600">All calculations execute in-browser using WebAssembly-optimized TypeScript. Zero server communication for health data.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-neutral-900 mb-2">Local Storage Only</h4>
-                    <p className="text-sm text-neutral-600">Patient data persists in browser localStorage with automatic cleanup. HIPAA-compliant by design.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-medium text-neutral-900 mb-2">Open Source Algorithms</h4>
-                    <p className="text-sm text-neutral-600">Complete implementation transparency with peer-reviewable code and clinical validation references.</p>
-                  </div>
-                </div>
-              </div>
+            {/* Algorithm Comparison - Simplified Overview */}
+            <div className="mb-12">
+              <AlgorithmComparisonSection />
             </div>
 
-            {/* Clinical Evidence Panel */}
-            <div className="bg-gradient-to-r from-healing-sage/10 to-primary-50/30 p-8 rounded-2xl border border-healing-sage/20 mb-12">
-              <h3 className="medical-heading-secondary text-center text-neutral-900 mb-6 flex items-center justify-center">
-                <svg className="w-6 h-6 mr-3 text-primary-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                </svg>
-                Clinical Evidence & References
-              </h3>
-              <ClinicalEvidencePanel />
+
+            {/* Clinical Evidence Panel - Simplified */}
+            <div className="mb-16">
+              <ClinicalEvidenceSection />
             </div>
 
-            {/* Minimal FAQ Toggles */}
-            <div className="border-t border-neutral-200 pt-8">
-              <h3 className="medical-heading-secondary text-center text-neutral-900 mb-6">
-                Common Questions
-              </h3>
-              <div className="max-w-3xl mx-auto space-y-2">
-                <details className="group">
-                  <summary className="cursor-pointer p-4 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors">
-                    <span className="font-medium text-neutral-900">Who should use this calculator?</span>
-                  </summary>
-                  <p className="p-4 text-neutral-700 text-sm">
-                    <CitationTooltip referenceId="pce-age-validation">
-                      <span className="underline decoration-dotted">Adults aged 40-79</span>
-                    </CitationTooltip> without known cardiovascular disease. Particularly valuable for clinicians, researchers, and individuals with risk factors.
-                  </p>
-                </details>
-                
-                <details className="group">
-                  <summary className="cursor-pointer p-4 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors">
-                    <span className="font-medium text-neutral-900">Can I integrate this into clinical software?</span>
-                  </summary>
-                  <p className="p-4 text-neutral-700 text-sm">Yes. Our open-source TypeScript implementation can be integrated into EHR systems, clinical decision support tools, or research platforms.</p>
-                </details>
-                
-                <details className="group">
-                  <summary className="cursor-pointer p-4 bg-neutral-50 hover:bg-neutral-100 rounded-lg transition-colors">
-                    <span className="font-medium text-neutral-900">What are the limitations?</span>
-                  </summary>
-                  <p className="p-4 text-neutral-700 text-sm">
-                    <CitationTooltip referenceId="pce-limitations">
-                      <span className="underline decoration-dotted">PCE validation is limited to ages 40-79, specific race categories, and 10-year timeframes</span>
-                    </CitationTooltip>. Not applicable for secondary prevention or known CVD.
-                  </p>
-                </details>
-              </div>
+            {/* Simplified FAQ Section */}
+            <div className="mb-12">
+              <SimplifiedFAQSection />
             </div>
           </div>
         </div>

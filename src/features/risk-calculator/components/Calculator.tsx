@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Button, Disclaimer, AlgorithmToggle } from '@/components/ui';
+import AlgorithmInfoBanner from '@/components/ui/AlgorithmInfoBanner';
+import StreamlinedFooter from '@/components/ui/StreamlinedFooter';
 import { useFormState } from '../hooks/useFormState';
 import { configuredRiskCalculator, switchToAlgorithm, enableAlgorithmComparison } from '../services';
 import StepIndicator from './StepIndicator';
@@ -82,8 +84,6 @@ const Calculator: React.FC = () => {
   };
 
   const handleAlgorithmSwitch = (algorithm: 'PCE' | 'PREVENT') => {
-    console.log('Calculator handleAlgorithmSwitch called with:', algorithm);
-    console.log('Current formData.selectedAlgorithm:', formData.selectedAlgorithm);
     switchAlgorithm(algorithm);
   };
 
@@ -155,7 +155,7 @@ const Calculator: React.FC = () => {
                 Bioprognostika Health Prediction
               </h1>
               <p className="text-prediction-600 mt-1 font-medium">
-                Advanced cardiovascular risk modeling • Step {formData.currentStep} of {totalSteps} • Current: {formData.selectedAlgorithm}
+                Step {formData.currentStep} of {totalSteps} • ~{Math.max(1, 3 - formData.currentStep)} minutes remaining • Using {formData.selectedAlgorithm} Algorithm
               </p>
             </div>
             <div className="flex items-center space-x-4">
@@ -174,15 +174,12 @@ const Calculator: React.FC = () => {
             </div>
           </div>
           
-          {/* Algorithm Info */}
-          <div className="mt-4 p-3 bg-blue-50 rounded-lg border border-blue-200">
-            <div className="text-sm text-blue-800">
-              <strong>{(formData.selectedAlgorithm || 'PCE') === 'PREVENT' ? 'PREVENT 2024:' : 'PCE 2013:'}</strong>
-              {(formData.selectedAlgorithm || 'PCE') === 'PREVENT' 
-                ? ' Enhanced algorithm with kidney function, providing both 10-year and 30-year cardiovascular risk estimates (Ages 30-79)'
-                : ' Traditional Pooled Cohort Equations for 10-year cardiovascular risk assessment (Ages 40-79)'
-              }
-            </div>
+          {/* Algorithm Info - Simplified */}
+          <div className="mt-4">
+            <AlgorithmInfoBanner 
+              algorithm={formData.selectedAlgorithm || 'PCE'}
+              currentStep={formData.currentStep}
+            />
           </div>
         </div>
       </div>
@@ -236,58 +233,20 @@ const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* Progress Save Notice */}
-          <div className="mt-8">
-            <Disclaimer type="info">
-              <p className="text-sm">
-                <strong>Your progress is automatically saved</strong> and will be restored 
-                if you refresh the page or return later. All data remains private and 
-                is stored only in your browser.
-              </p>
-            </Disclaimer>
+          {/* Progress Save Notice - Simplified */}
+          <div className="mt-8 text-center">
+            <p className="text-xs text-neutral-500 flex items-center justify-center">
+              <svg className="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              Progress automatically saved • Private & secure • No registration required
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Educational Footer */}
-      <div className="bg-white border-t border-neutral-200 mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="max-w-3xl mx-auto text-center">
-            <h3 className="text-lg font-semibold text-neutral-900 mb-4">
-              About Bioprognostika Prediction Engine
-            </h3>
-            <div className="grid md:grid-cols-3 gap-6 text-sm text-neutral-600">
-              <div>
-                <h4 className="font-medium text-prediction-700 mb-2 flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                  Clinical-Grade
-                </h4>
-                <p>Uses 2013 ACC/AHA Pooled Cohort Equations, the gold standard for cardiovascular risk assessment with 25+ years of validation.</p>
-              </div>
-              <div>
-                <h4 className="font-medium text-precision-700 mb-2 flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke="currentColor" strokeWidth="2" fill="none"/>
-                  </svg>
-                  Evidence-Based
-                </h4>
-                <p>Advanced algorithms trained on millions of patient outcomes to provide personalized health predictions.</p>
-              </div>
-              <div>
-                <h4 className="font-medium text-intelligence-700 mb-2 flex items-center">
-                  <svg className="w-4 h-4 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-                  </svg>
-                  Educational Focus
-                </h4>
-                <p>Designed for health education and informed discussions with healthcare providers, not clinical diagnosis.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      {/* Educational Footer - Simplified */}
+      <StreamlinedFooter />
     </div>
   );
 };

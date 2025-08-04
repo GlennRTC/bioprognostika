@@ -29,3 +29,6 @@ dist-ssr
 # Claude Code
 .claude
 CLAUDE.md
+temp
+ACCESSIBILITY_COMPLIANCE.md
+UX_IMPROVEMENTS_SUMMARY.md

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Input, Card, Disclaimer } from '@/components/ui';
+import { Input, Card, Disclaimer, MedicalInput, SDILookupGuide } from '@/components/ui';
 import { PatientParams } from '@/types';
 import { calculateBMI } from '../services/clinicalUtils';
 
@@ -115,26 +115,55 @@ const Step4LifestyleSocial: React.FC<Step4LifestyleSocialProps> = ({
               Social Determinants of Health (Optional)
             </h4>
             
-            <Input
-              label="Social Deprivation Index"
-              name="socialDeprivationIndex"
-              type="number"
-              value={formData.socialDeprivationIndex || ''}
-              onChange={(value) => updateField('socialDeprivationIndex', Number(value) || undefined)}
-              placeholder="25"
-              min={0}
-              max={100}
-              error={errors.socialDeprivationIndex}
-              help="0-100 (higher values indicate greater social disadvantage)"
-            />
+            <div className="space-y-4">
+              <MedicalInput
+                label="Social Deprivation Index"
+                name="socialDeprivationIndex"
+                type="number"
+                value={formData.socialDeprivationIndex || ''}
+                onChange={(value) => updateField('socialDeprivationIndex', typeof value === 'number' ? value : undefined)}
+                placeholder="Enter percentile (0-100)"
+                min={0}
+                max={100}
+                error={errors.socialDeprivationIndex}
+                help="Enter your neighborhood's social deprivation percentile (0 = least deprived, 100 = most deprived)"
+                medicalParameter="socialDeprivationIndex"
+                showMedicalTooltip={true}
+                clinicalContext="SDI helps personalize cardiovascular risk by accounting for social and environmental factors that affect health outcomes"
+                warningThresholds={{
+                  high: 75,
+                  message: "High social deprivation may indicate need for enhanced support services and community-based interventions"
+                }}
+                normalRange="Varies by location (0-100 percentile)"
+              />
 
-            <Disclaimer type="info" className="mt-3">
-              <p className="text-sm">
-                The Social Deprivation Index considers factors like poverty, housing, transportation, 
-                and education that can impact cardiovascular health. This helps provide more 
-                personalized risk assessment.
-              </p>
-            </Disclaimer>
+              <SDILookupGuide
+                currentScore={formData.socialDeprivationIndex}
+                onScoreEntered={(score) => updateField('socialDeprivationIndex', score)}
+                className="mt-4"
+              />
+
+              <Disclaimer type="info">
+                <div className="text-sm space-y-2">
+                  <p>
+                    <strong>About Social Determinants:</strong> The PREVENT algorithm incorporates social 
+                    factors to provide more comprehensive risk assessment. Social disadvantage is associated 
+                    with higher rates of cardiovascular disease through multiple pathways including:
+                  </p>
+                  <ul className="list-disc list-inside ml-4 space-y-1">
+                    <li>Limited access to healthy foods and safe exercise opportunities</li>
+                    <li>Higher stress levels and reduced social support</li>
+                    <li>Environmental exposures and housing quality issues</li>
+                    <li>Reduced access to preventive healthcare services</li>
+                    <li>Economic barriers to medication adherence</li>
+                  </ul>
+                  <p>
+                    <strong>Privacy Note:</strong> This information is processed locally and helps provide 
+                    more personalized risk assessment. You may leave this field blank if preferred.
+                  </p>
+                </div>
+              </Disclaimer>
+            </div>
           </div>
         )}
 
