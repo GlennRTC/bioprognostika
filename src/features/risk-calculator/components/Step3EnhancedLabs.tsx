@@ -98,11 +98,7 @@ const Step3EnhancedLabs: React.FC<Step3EnhancedLabsProps> = ({
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="relative">
               <Input
-                label={(
-                  <SubtleMedicalTooltip parameter={SUBTLE_MEDICAL_PARAMETERS.eGFR} mode="minimal">
-                    eGFR
-                  </SubtleMedicalTooltip>
-                )}
+                label="eGFR"
                 name="eGFR"
                 type="number"
                 value={formData.eGFR || ''}

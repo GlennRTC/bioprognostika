@@ -55,13 +55,20 @@ const Calculator: React.FC = () => {
     
     try {
       const patientParams = getPatientParams();
-      
       // Configure the algorithm
       switchToAlgorithm(formData.selectedAlgorithm || 'PREVENT');
       enableAlgorithmComparison(true); // Enable comparison for educational purposes
       
       // Calculate risk with the configured algorithm
       const result = await configuredRiskCalculator.calculateRisk(patientParams);
+      
+      if (!result || !result.hasOwnProperty('success')) {
+        throw new Error('Invalid result returned from calculator');
+      }
+      
+      if (!result.success && result.error) {
+        throw new Error(result.error);
+      }
       
       // Store result and algorithm info in localStorage for Results page
       const resultData = {
@@ -76,8 +83,8 @@ const Calculator: React.FC = () => {
       // Navigate to results
       navigate('/results');
     } catch (error) {
-      console.error('Error calculating risk:', error);
-      alert(`There was an error calculating your risk: ${error instanceof Error ? error.message : 'Unknown error'}. Please check your inputs and try again.`);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      alert(`There was an error calculating your risk: ${errorMessage}. Please check your inputs and try again.`);
     } finally {
       setIsCalculating(false);
     }
@@ -155,7 +162,7 @@ const Calculator: React.FC = () => {
                 Bioprognostika Health Prediction
               </h1>
               <p className="text-prediction-600 mt-1 font-medium">
-                Step {formData.currentStep} of {totalSteps} • ~{Math.max(1, 3 - formData.currentStep)} minutes remaining • Using {formData.selectedAlgorithm} Algorithm
+                Step {formData.currentStep} of {totalSteps} • ~{Math.max(1, totalSteps + 1 - formData.currentStep)} minutes remaining • Using {formData.selectedAlgorithm || 'PREVENT'} Algorithm
               </p>
             </div>
             <div className="flex items-center space-x-4">

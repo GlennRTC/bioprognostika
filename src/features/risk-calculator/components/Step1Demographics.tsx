@@ -1,75 +1,47 @@
-import React from 'react';
-import { Input, Card, Disclaimer } from '@/components/ui';
+import React, { memo } from 'react';
+import { Card, Disclaimer } from '@/components/ui';
 import { PatientParams } from '@/types';
+import FormField from './common/FormField';
+import { getStepConfig } from '../config/stepConfig';
 
 interface Step1DemographicsProps {
-  formData: Partial<PatientParams>;
+  formData: Partial<PatientParams> & { selectedAlgorithm?: 'PCE' | 'PREVENT' };
   errors: Record<string, string>;
   updateField: (field: keyof PatientParams, value: any) => void;
 }
 
-const Step1Demographics: React.FC<Step1DemographicsProps> = ({
+const Step1Demographics: React.FC<Step1DemographicsProps> = memo(({
   formData,
   errors,
   updateField,
 }) => {
-  const genderOptions = [
-    { value: 'male', label: 'Male' },
-    { value: 'female', label: 'Female' },
-    { value: 'non-binary', label: 'Non-binary / Other' },
-  ];
-
-  const raceOptions = [
-    { value: 'white', label: 'Non-Hispanic White' },
-    { value: 'black', label: 'Non-Hispanic Black / African American' },
-    { value: 'other', label: 'Other Race / Ethnicity' },
-  ];
+  const algorithm = formData.selectedAlgorithm || 'PREVENT';
+  const stepConfig = getStepConfig(algorithm, 1);
+  
+  if (!stepConfig) {
+    return (
+      <Card variant="medical" title="Error" subtitle="Configuration not found">
+        <p>Unable to load step configuration.</p>
+      </Card>
+    );
+  }
 
   return (
-    <Card variant="medical" title="Basic Information" subtitle="Step 1 of 3: Tell us about yourself">
+    <Card variant="medical" title={stepConfig.title} subtitle={stepConfig.subtitle}>
       <div className="space-y-6">
-        {/* Age Input */}
-        <Input
-          label="Age"
-          name="age"
-          type="number"
-          value={formData.age || ''}
-          onChange={(value) => updateField('age', Number(value))}
-          placeholder="Enter your age"
-          min={40}
-          max={79}
-          required
-          error={errors.age}
-          help="This calculator is validated for ages 40-79 years"
-        />
+        {/* Render form fields from configuration */}
+        {stepConfig.fields.map((field) => (
+          <FormField
+            key={field.key}
+            config={field}
+            value={formData[field.key]}
+            error={errors[field.key]}
+            onChange={updateField}
+          />
+        ))}
 
-        {/* Gender Selection */}
-        <Input
-          label="Gender"
-          name="gender"
-          type="select"
-          value={formData.gender || ''}
-          onChange={(value) => updateField('gender', value)}
-          options={genderOptions}
-          required
-          error={errors.gender}
-          help="Biological sex assigned at birth for medical calculation purposes"
-        />
-
-        {/* Race/Ethnicity Selection */}
-        <Input
-          label="Race / Ethnicity"
-          name="race"
-          type="select"
-          value={formData.race || ''}
-          onChange={(value) => updateField('race', value)}
-          options={raceOptions}
-          required
-          error={errors.race}
-          help="Used for population-specific risk calculation accuracy"
-        />
-
-        {/* Information about non-binary calculations */}
+        
+        {/* Conditional disclaimers based on user selections */}
         {formData.gender === 'non-binary' && (
           <Disclaimer type="info">
             <p className="text-sm">
@@ -80,7 +52,6 @@ const Step1Demographics: React.FC<Step1DemographicsProps> = ({
           </Disclaimer>
         )}
 
-        {/* Information about race-based calculations */}
         {formData.race === 'other' && (
           <Disclaimer type="info">
             <p className="text-sm">
@@ -101,6 +72,8 @@ const Step1Demographics: React.FC<Step1DemographicsProps> = ({
       </div>
     </Card>
   );
-};
+});
+
+Step1Demographics.displayName = 'Step1Demographics';
 
 export default Step1Demographics;

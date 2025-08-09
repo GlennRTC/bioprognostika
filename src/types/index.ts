@@ -177,24 +177,6 @@ export interface AlgorithmConfig {
   enableInterventions: boolean;
 }
 
-export interface ValidationRange {
-  min: number;
-  max: number;
-  required?: boolean;
-  default?: number;
-}
-
-export interface ValidationRules {
-  [key: string]: ValidationRange;
-}
-
-export interface FormStep {
-  title: string;
-  description: string;
-  fields: string[];
-  optional?: boolean;
-}
-
 // UI Component Props
 export interface ButtonProps {
   children: React.ReactNode;
@@ -232,25 +214,3 @@ export interface CardProps {
   className?: string;
 }
 
-// Analytics and Validation
-export interface AnalyticsEvent {
-  event: string;
-  properties?: Record<string, any>;
-  timestamp?: Date;
-}
-
-export interface ValidationMetrics {
-  formCompletionRate: number;
-  scenarioEngagementRate: number;
-  emailSignupRate: number;
-  sharingRate: number;
-  averageTimeOnPage: number;
-  bounceRate: number;
-}
-
-export interface UserFeedback {
-  rating: number;
-  comments?: string;
-  wouldRecommend: boolean;
-  timestamp: Date;
-}

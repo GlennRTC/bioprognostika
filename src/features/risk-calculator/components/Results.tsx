@@ -19,7 +19,7 @@ const Results: React.FC = () => {
         const result = parsedData.riskResult || parsedData;
         setRiskResult(result);
       } catch (error) {
-        console.error('Error parsing risk result:', error);
+        // Error parsing stored data, redirect to calculator
         navigate('/calculator');
       }
     } else {
@@ -36,7 +36,7 @@ const Results: React.FC = () => {
   };
 
   const handleShareResult = () => {
-    if (riskResult) {
+    if (riskResult && riskResult.riskCategory) {
       const shareText = `My 10-year cardiovascular risk prediction: ${riskResult.risk}% (${riskResult.riskCategory.level} risk) - calculated using Bioprognostika advanced health prediction platform`;
       
       if (navigator.share) {
@@ -44,7 +44,9 @@ const Results: React.FC = () => {
           title: 'My Cardiovascular Risk Assessment',
           text: shareText,
           url: window.location.origin,
-        }).catch(console.error);
+        }).catch(() => {
+          // Sharing failed, user will handle manually
+        });
       } else {
         // Fallback to clipboard
         navigator.clipboard.writeText(shareText).then(() => {
@@ -123,7 +125,7 @@ Algorithm: 2013 ACC/AHA Pooled Cohort Equations
   }
 
   // Additional safety check for required properties
-  if (!riskResult.risk || !riskResult.riskCategory) {
+  if (!riskResult.risk || !riskResult.riskCategory || !riskResult.riskCategory.level) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-primary-50 to-healing-mint/20 flex items-center justify-center">
         <div className="max-w-md mx-auto bg-white rounded-xl shadow-lg p-8 text-center">
@@ -210,7 +212,7 @@ Algorithm: 2013 ACC/AHA Pooled Cohort Equations
                 <div className="bg-white/80 p-4 rounded-lg border border-neutral-200">
                   <div className="font-medium text-neutral-900">Your Risk</div>
                   <div className="text-2xl font-bold text-prediction-600">{riskResult.risk}%</div>
-                  <div className="text-neutral-600">{riskResult.riskCategory.level} risk</div>
+                  <div className="text-neutral-600">{riskResult.riskCategory?.level || 'Unknown'} risk</div>
                 </div>
                 <div className="bg-white/80 p-4 rounded-lg border border-neutral-200">
                   <div className="font-medium text-neutral-900">Average for Age</div>
